@@ -6,22 +6,26 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.example.goaagara.R
 import com.example.goaagara.model.News
 import com.example.goaagara.model.dataNews
 import com.example.goaagara.ui.notifications.detail.detail_news
-import kotlinx.android.synthetic.main.list_notifications_new.view.*
+import kotlinx.android.synthetic.main.list_notifications_popular.view.*
 
-class NewsAdapter(var data: ArrayList<News>?) :RecyclerView.Adapter<NewsAdapter.NewsHolder>() {
+class NewsAdapter2(var data: ArrayList<News>?) :RecyclerView.Adapter<NewsAdapter2.NewsHolder>() {
     class NewsHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         val title = itemView.titleNotification
         val des = itemView.descNotification
         val icon = itemView.imgNotification
+        val date = itemView.date
+        val radius = itemView.resources.getDimensionPixelSize(R.dimen.corner_radius)
 
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.list_notifications_new, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.list_notifications_popular, parent, false)
         val holder =NewsHolder(view)
 
         return holder
@@ -34,20 +38,28 @@ class NewsAdapter(var data: ArrayList<News>?) :RecyclerView.Adapter<NewsAdapter.
     override fun onBindViewHolder(holder: NewsHolder, position: Int) {
         holder.des.text =data?.get(position)?.description
         holder.title.text = data?.get(position)?.title
-        Glide.with(holder.itemView.context).load(data?.get(position)?.urlToImage).into(holder.icon)
+        holder.date.text = data?.get(position)?.publishedAt
+
+        Glide.with(holder.itemView.context)
+            .load(data?.get(position)?.urlToImage)
+            .apply(RequestOptions
+                .overrideOf(270, 320)
+                .fitCenter())
+            .transform(RoundedCorners(holder.radius))
+            .into(holder.icon)
 
 
         holder.itemView.setOnClickListener{
             val intent = Intent(holder.itemView.context, detail_news::class.java)
             intent.putExtra("data", dataNews(
-                data?.get(position)?.id.toString(),
-                data?.get(position)?.name.toString(),
-                data?.get(position)?.author.toString(),
-                data?.get(position)?.title.toString(),
-                data?.get(position)?.description.toString(),
-                data?.get(position)?.publishedAt.toString(),
-                data?.get(position)?.url.toString(),
-                data?.get(position)?.urlToImage.toString()
+                    data?.get(position)?.id.toString(),
+                    data?.get(position)?.name.toString(),
+                    data?.get(position)?.author.toString(),
+                    data?.get(position)?.title.toString(),
+                    data?.get(position)?.description.toString(),
+                    data?.get(position)?.publishedAt.toString(),
+                    data?.get(position)?.url.toString(),
+                    data?.get(position)?.urlToImage.toString()
             )
             )
             holder.itemView.context.startActivity(intent)
